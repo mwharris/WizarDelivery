@@ -62,7 +62,7 @@ void ADeliveryGameMode::SetupTeleportCircle(ATeleportCircle* TCircle)
 
 void ADeliveryGameMode::WarpPlayerToCircle(int32 CircleIndex) 
 {
-    if (PlayerIndex == CircleIndex) { return; }
+    if (PlayerIndex == CircleIndex || GameOver) { return; }
     if (TeleportCircles.Num() <= 0 || CircleIndex < 0 || CircleIndex >= TeleportCircles.Num()) 
     { 
         UE_LOG(LogTemp, Error, TEXT("WarpPlayerToCircle: No circles OR Index is incorrect!"));
@@ -85,6 +85,7 @@ void ADeliveryGameMode::WarpPlayerToCircle(int32 CircleIndex)
 
 void ADeliveryGameMode::ProcessGesture(FString GestureName) 
 {
+    if (ActiveDelivery == nullptr || GameOver) { return; }
     // Get the Gesture associated with the input (if one exists)
     static const FString ContextString(TEXT("GestureStruct"));
     FGestureStruct* InputGesture = GestureDataTable->FindRow<FGestureStruct>(FName(GestureName), ContextString, true);
@@ -102,15 +103,14 @@ void ADeliveryGameMode::ProcessGesture(FString GestureName)
             CombinationIndex++;
             if (CombinationIndex == DeliveryCombination.Num()) 
             {
-                // TODO: Teleport this package away
-                CombinationIndex = 0;
+                ResolveDelivery(true, DeliveryCombination.Num());
             }
         }
         else 
         {
             UE_LOG(LogTemp, Warning, TEXT("Incorrect: %s = %s"), *InputGesture->GestureName, *CombinationGesture->GestureName);
             NotifyHUDInputProcessed(PlayerIndex + 1, CombinationIndex, false);
-            // TODO: Blow up this package, reset Combinataion Index
+            ResolveDelivery(false, DeliveryCombination.Num());
         }
     }
     else 
@@ -119,7 +119,30 @@ void ADeliveryGameMode::ProcessGesture(FString GestureName)
     }
 }
 
+void ADeliveryGameMode::ResolveDelivery(bool Success, int32 ComboLength) 
+{
+    TeleportCircles[PlayerIndex]->SetDelivery(nullptr);
+    ActiveDelivery->ResolveDelivery(Success);
+    ActiveDelivery = nullptr;
+    CombinationIndex = 0;
+    if (Success) 
+    {
+        Score += ComboLength;
+        NotifyHUDUpdateScore(Score);
+    }
+    else 
+    {
+        GameOver = true;
+	    NotifyHUDGameOver(Score);
+    }
+}
+
 ADeliveryItem* ADeliveryGameMode::GetActiveDelivery() const
 {
     return ActiveDelivery;
+}
+
+int32 ADeliveryGameMode::GetScore() const
+{
+    return Score;
 }

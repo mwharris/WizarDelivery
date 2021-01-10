@@ -30,6 +30,9 @@ class WIZARDDELIVERY_API ADeliveryGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category="Scoring")
+	int32 GetScore() const;
+
 	void WarpPlayerToCircle(int32 CircleIndex);
 	ADeliveryItem* GetActiveDelivery() const;
 	void ProcessGesture(FString GestureName);
@@ -39,6 +42,10 @@ protected:
 	void NotifyHUDDeliveryCreated(int32 CircleNum);
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
 	void NotifyHUDInputProcessed(int32 CircleNum, int32 ComboIndex, bool Correct);
+	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
+	void NotifyHUDUpdateScore(int32 NewScore);
+	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
+	void NotifyHUDGameOver(int32 FinalScore);
 
 	virtual void BeginPlay() override;
 
@@ -59,8 +66,11 @@ private:
 	int32 PlayerIndex = 99;
 	ADeliveryItem* ActiveDelivery;
 	int32 CombinationIndex = 0;
+	int32 Score = 0;
+	bool GameOver = false;
 
 	void Init();
 	void SetupTeleportCircle(ATeleportCircle* TCircle);
+	void ResolveDelivery(bool Success, int32 ComboLength);
 
 };

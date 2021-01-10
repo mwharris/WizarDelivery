@@ -43,7 +43,16 @@ void ADeliveryItem::CreateCombination(int32 MinGestureNum, int32 MaxGestureNum, 
 
 void ADeliveryItem::ResolveDelivery(bool Success) 
 {
-	// TODO: blow up or teleport
+	if (Success) 
+	{
+		// Teleport it away
+		Destroy();
+	}
+	else
+	{
+		// Blow it up
+		Destroy();
+	}
 }
 
 TArray<FGestureStruct*> ADeliveryItem::GetCombination() const
