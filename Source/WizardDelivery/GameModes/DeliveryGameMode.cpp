@@ -75,7 +75,7 @@ void ADeliveryGameMode::WarpPlayerToCircle(int32 CircleIndex)
         // Move the player to that circle's player location
         FVector Location = TCircle->PlayerPoint->GetComponentTransform().GetLocation();
         PlayerRef->SetActorLocation(Location);
-        PlayerIndex = TCircle->GetCircleNum();
+        PlayerIndex = CircleIndex;
         // Get a reference to the delivery on the player's current circle
         ActiveDelivery = TCircle->GetDelivery();
         // Reset our Combination Index
@@ -97,8 +97,8 @@ void ADeliveryGameMode::ProcessGesture(FString GestureName)
         if (CombinationGesture != nullptr && CombinationGesture->GestureId == InputGesture->GestureId) 
         {
             UE_LOG(LogTemp, Warning, TEXT("Correct: %s = %s"), *InputGesture->GestureName, *CombinationGesture->GestureName);
-            UE_LOG(LogTemp, Warning, TEXT("Circle: %d, Index: %d"), PlayerIndex, CombinationIndex);
-            NotifyHUDInputProcessed(PlayerIndex, CombinationIndex, true);
+            UE_LOG(LogTemp, Warning, TEXT("Circle: %d, Index: %d"), PlayerIndex + 1, CombinationIndex);
+            NotifyHUDInputProcessed(PlayerIndex + 1, CombinationIndex, true);
             CombinationIndex++;
             if (CombinationIndex == DeliveryCombination.Num()) 
             {
@@ -109,7 +109,7 @@ void ADeliveryGameMode::ProcessGesture(FString GestureName)
         else 
         {
             UE_LOG(LogTemp, Warning, TEXT("Incorrect: %s = %s"), *InputGesture->GestureName, *CombinationGesture->GestureName);
-            NotifyHUDInputProcessed(PlayerIndex, CombinationIndex, false);
+            NotifyHUDInputProcessed(PlayerIndex + 1, CombinationIndex, false);
             // TODO: Blow up this package, reset Combinataion Index
         }
     }
