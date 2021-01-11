@@ -2,6 +2,8 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/DataTable.h"
+#include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
 #include "WizardDelivery/GameModes/DeliveryGameMode.h"
 
 ADeliveryItem::ADeliveryItem()
@@ -18,6 +20,32 @@ ADeliveryItem::ADeliveryItem()
 void ADeliveryItem::BeginPlay()
 {
 	Super::BeginPlay();
+	// Get a reference to the GameMode
+	GameModeRef = Cast<ADeliveryGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameModeRef == nullptr) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("ADeliveryItem::BeginPlay(): Cannot find Game Mode!"));
+	}
+	// Set up our expire timer
+	CurrExpireTime = MaxExpireTime;
+	GetWorldTimerManager().SetTimer(ExpireTimerHandle, this, &ADeliveryItem::ExpireTick, ExpireTickFrequency, true);
+}
+
+void ADeliveryItem::ExpireTick() 
+{
+	CurrExpireTime -= ExpireTickFrequency;
+	if (CurrExpireTime <= 0) 
+	{
+		GetWorldTimerManager().ClearTimer(ExpireTimerHandle);
+	}
+	if (GameModeRef != nullptr) 
+	{
+		bool KillYourself = GameModeRef->DeliveryExpireTick(this);
+		if (KillYourself) 
+		{
+			Destroy();
+		}
+	}
 }
 
 void ADeliveryItem::CreateCombination(int32 MinGestureNum, int32 MaxGestureNum, UDataTable* GestureDataTable) 
@@ -55,9 +83,14 @@ void ADeliveryItem::ResolveDelivery(bool Success)
 	}
 }
 
-TArray<FGestureStruct*> ADeliveryItem::GetCombination() const
+float ADeliveryItem::GetMaxExpireTime() const
 {
-	return Combination;
+	return MaxExpireTime;
+}
+
+float ADeliveryItem::GetCurrExpireTime() const
+{
+	return CurrExpireTime;
 }
 
 TArray<FString> ADeliveryItem::GetCombinationUI() const
@@ -68,4 +101,9 @@ TArray<FString> ADeliveryItem::GetCombinationUI() const
 		ReturnArray.Add(Gesture->UISymbol);
 	}
 	return ReturnArray;
+}
+
+TArray<FGestureStruct*> ADeliveryItem::GetCombination() const
+{
+	return Combination;
 }

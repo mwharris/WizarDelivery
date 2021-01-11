@@ -121,10 +121,13 @@ void ADeliveryGameMode::ProcessGesture(FString GestureName)
     }
 }
 
-void ADeliveryGameMode::ResolveDelivery(bool Success, int32 ComboLength) 
+void ADeliveryGameMode::ResolveDelivery(bool Success, int32 ComboLength, bool DelayDestroy) 
 {
     TeleportCircles[PlayerIndex]->SetDelivery(nullptr);
-    ActiveDelivery->ResolveDelivery(Success);
+    if (!DelayDestroy)
+    {
+        ActiveDelivery->ResolveDelivery(Success);
+    }
     ActiveDelivery = nullptr;
     CombinationIndex = 0;
     if (Success) 
@@ -137,6 +140,30 @@ void ADeliveryGameMode::ResolveDelivery(bool Success, int32 ComboLength)
         GameOver = true;
 	    NotifyHUDGameOver(Score);
     }
+}
+
+bool ADeliveryGameMode::DeliveryExpireTick(ADeliveryItem* DeliveryItem) 
+{
+    if (DeliveryItem == nullptr) { return false; }
+    // Find which circle this delivery is in
+    int32 CircleNum = 0;
+    for (ATeleportCircle* Circle : TeleportCircles) 
+    {
+        if (Circle->GetDelivery() ==  DeliveryItem)
+        {
+            CircleNum = Circle->GetCircleNum();
+        }
+    }
+    // Tick the progress bar on the UI
+    float Percent = DeliveryItem->GetCurrExpireTime() / DeliveryItem->GetMaxExpireTime();
+    NotifyHUDDeliveryTimer(CircleNum, Percent);
+    // Destroy the delivery and punish player if it expired
+    if (DeliveryItem->GetCurrExpireTime() <= 0) 
+    {
+        ResolveDelivery(false, DeliveryItem->GetCombination().Num(), true);
+        return true;
+    }
+    return false;
 }
 
 ADeliveryItem* ADeliveryGameMode::GetActiveDelivery() const

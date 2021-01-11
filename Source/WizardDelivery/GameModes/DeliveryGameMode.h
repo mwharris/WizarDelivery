@@ -36,6 +36,7 @@ public:
 	void WarpPlayerToCircle(int32 CircleIndex);
 	ADeliveryItem* GetActiveDelivery() const;
 	void ProcessGesture(FString GestureName);
+	bool DeliveryExpireTick(ADeliveryItem* DeliveryItem);
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
@@ -46,6 +47,8 @@ protected:
 	void NotifyHUDUpdateScore(int32 NewScore, int32 CircleNum);
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
 	void NotifyHUDGameOver(int32 FinalScore);
+	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
+	void NotifyHUDDeliveryTimer(int32 CircleNum, float Percent);
 
 	virtual void BeginPlay() override;
 
@@ -71,6 +74,6 @@ private:
 
 	void Init();
 	void SetupTeleportCircle(ATeleportCircle* TCircle);
-	void ResolveDelivery(bool Success, int32 ComboLength);
+	void ResolveDelivery(bool Success, int32 ComboLength, bool DelayDestroy = false);
 
 };
