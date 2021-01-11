@@ -100,7 +100,6 @@ void ADeliveryGameMode::TickSpawnDelivery()
             RampUpCounter = RampUpFrequencySeconds;
         }
     }
-    UE_LOG(LogTemp, Warning, TEXT("Refreshing spawner.  SpawnTimerFrequency: %f, RampUpCounter: %f, RampUpFrequencySeconds: %f"), SpawnTimerFrequency, RampUpCounter, RampUpFrequencySeconds);
 	GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &ADeliveryGameMode::TickSpawnDelivery, SpawnTimerFrequency, false);
 }
 
