@@ -37,6 +37,7 @@ public:
 	ADeliveryItem* GetActiveDelivery() const;
 	void ProcessGesture(FString GestureName);
 	bool DeliveryExpireTick(ADeliveryItem* DeliveryItem);
+	bool IsGameOver() const;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
@@ -63,6 +64,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combinations", meta = (AllowPrivateAccess = "true"))
 	int32 MaxGestureNum = 8;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	float SpawnTimerFrequency = 1.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	float RampUpSpeed = 0.1f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	float RampUpFrequencySeconds = 20.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	float MinSpawnTime = 0.5f;
+
 	int32 NumGestures = 0;
 	TArray<ATeleportCircle*> TeleportCircles; 
 	AWizardCharacter* PlayerRef;
@@ -71,9 +81,12 @@ private:
 	int32 CombinationIndex = 0;
 	int32 Score = 0;
 	bool GameOver = false;
+	FTimerHandle SpawnTimerHandle;
+	float RampUpCounter = 0;
 
 	void Init();
-	void SetupTeleportCircle(ATeleportCircle* TCircle);
+	void SpawnDeliveryAtCircle(ATeleportCircle* TCircle);
+	void TickSpawnDelivery();
 	void ResolveDelivery(bool Success, int32 ComboLength, bool DelayDestroy = false);
 
 };

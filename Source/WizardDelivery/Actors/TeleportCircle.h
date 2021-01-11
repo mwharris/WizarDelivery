@@ -45,7 +45,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Properties", meta=(AllowPrivateAccess="true"))
 	int32 CircleNum = 0;
 
-	bool Empty = true;
 	ADeliveryItem* CurrDelivery;
 
 };

@@ -33,18 +33,22 @@ void ADeliveryItem::BeginPlay()
 
 void ADeliveryItem::ExpireTick() 
 {
+	// Don't expire if the game is over
+	if (GameModeRef == nullptr || GameModeRef->IsGameOver()) 
+	{
+		GetWorldTimerManager().ClearTimer(ExpireTimerHandle);
+		return;
+	}
+	// Tick down our expire time
 	CurrExpireTime -= ExpireTickFrequency;
 	if (CurrExpireTime <= 0) 
 	{
 		GetWorldTimerManager().ClearTimer(ExpireTimerHandle);
 	}
-	if (GameModeRef != nullptr) 
+	// Kill ourselves if the GameMode says so
+	if (GameModeRef->DeliveryExpireTick(this)) 
 	{
-		bool KillYourself = GameModeRef->DeliveryExpireTick(this);
-		if (KillYourself) 
-		{
-			Destroy();
-		}
+		Destroy();
 	}
 }
 
@@ -73,12 +77,12 @@ void ADeliveryItem::ResolveDelivery(bool Success)
 {
 	if (Success) 
 	{
-		// Teleport it away
+		// TODO: Teleport it away
 		Destroy();
 	}
 	else
 	{
-		// Blow it up
+		// TODO: Blow it up
 		Destroy();
 	}
 }

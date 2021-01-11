@@ -2,6 +2,7 @@
 #include "Engine/DataTable.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "TimerManager.h"
 #include "WizardDelivery/Actors/DeliveryItem.h"
 #include "WizardDelivery/Actors/TeleportCircle.h"
 #include "WizardDelivery/Characters/WizardCharacter.h"
@@ -28,26 +29,33 @@ void ADeliveryGameMode::Init()
     // Gather all of the TeleportCircles
 	TArray<AActor*> TCActors;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATeleportCircle::StaticClass(), TCActors);
-    if (TCActors.Num() > 0) 
+    if (TCActors.Num() <= 0) { return; } 
+    // Spawn 1 delivery at a random circle
+    int32 RandCircleIndex = FMath::RandRange(1, TCActors.Num());
+    // Convert all Actors to TeleportCircles
+    for (AActor* TCActor : TCActors) 
     {
-        // Convert all Actors to TeleportCircles
-        for (AActor* TCActor : TCActors) 
+        if (ATeleportCircle* TCircle = Cast<ATeleportCircle>(TCActor))
         {
-            if (ATeleportCircle* TCircle = Cast<ATeleportCircle>(TCActor))
+            // Spawn a delivery if this is our random start point
+            if (TCircle->GetCircleNum() == RandCircleIndex) 
             {
-                SetupTeleportCircle(TCircle);
-                NotifyHUDDeliveryCreated(TCircle->GetCircleNum());
+                SpawnDeliveryAtCircle(TCircle);
             }
+            TeleportCircles.Add(TCircle);
         }
-        // Sort the array by CircleNum
-        TeleportCircles.Sort([](const ATeleportCircle& a, const ATeleportCircle& b) { return a.GetCircleNum() < b.GetCircleNum(); });
-        // Pick a random circle to spawn our character
-        int32 Index = FMath::RandRange(0, TeleportCircles.Num() - 1);
-        WarpPlayerToCircle(Index);
     }
+    // Sort the array by CircleNum
+    TeleportCircles.Sort([](const ATeleportCircle& a, const ATeleportCircle& b) { return a.GetCircleNum() < b.GetCircleNum(); });
+    // Pick a random circle to spawn our character
+    int32 Index = FMath::RandRange(0, TeleportCircles.Num() - 1);
+    WarpPlayerToCircle(Index);
+    // Start our spawn timer
+    RampUpCounter = RampUpFrequencySeconds; 
+	GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &ADeliveryGameMode::TickSpawnDelivery, SpawnTimerFrequency, false);
 }
 
-void ADeliveryGameMode::SetupTeleportCircle(ATeleportCircle* TCircle) 
+void ADeliveryGameMode::SpawnDeliveryAtCircle(ATeleportCircle* TCircle) 
 {
     // Spawn a delivery on this circle
     FActorSpawnParameters params;
@@ -57,7 +65,43 @@ void ADeliveryGameMode::SetupTeleportCircle(ATeleportCircle* TCircle)
     NewDelivery->CreateCombination(MinGestureNum, MaxGestureNum, GestureDataTable);
     // Setup circle, delivery, and circle array
     TCircle->SetDelivery(NewDelivery);
-    TeleportCircles.Add(TCircle);
+    // Set ActiveDelivery if the Player is currently on this circle while it's spawned
+    if (TCircle->GetCircleNum() == PlayerIndex + 1) 
+    {
+        ActiveDelivery = TCircle->GetDelivery();
+    }
+    // Tell the HUD to update this circle's combination
+    NotifyHUDDeliveryCreated(TCircle->GetCircleNum());
+}
+
+void ADeliveryGameMode::TickSpawnDelivery() 
+{
+    if (GameOver) { return; }
+    RampUpCounter -= SpawnTimerFrequency;
+    // Get a list of empty Teleport Circles
+    TArray<ATeleportCircle*> EmptyCircles;
+    for (ATeleportCircle* TCircle : TeleportCircles) 
+    {
+        if (TCircle->IsEmpty()) 
+        {
+            EmptyCircles.Add(TCircle);
+        }
+    }
+    // Spawn a delivery at a random empty circle if we found any
+    if (EmptyCircles.Num() > 0) 
+    {
+        int32 RandIndex = EmptyCircles.Num() == 1 ? 0 : FMath::RandRange(0, EmptyCircles.Num() - 1);
+        ATeleportCircle* TCircle = EmptyCircles[RandIndex];
+        SpawnDeliveryAtCircle(TCircle);
+        // Ramp up if our counter expired
+        if (RampUpCounter <= 0) 
+        {
+            SpawnTimerFrequency -= FMath::Clamp(RampUpSpeed, MinSpawnTime, 5.f);
+            RampUpCounter = RampUpFrequencySeconds;
+        }
+    }
+    UE_LOG(LogTemp, Warning, TEXT("Refreshing spawner.  SpawnTimerFrequency: %f, RampUpCounter: %f, RampUpFrequencySeconds: %f"), SpawnTimerFrequency, RampUpCounter, RampUpFrequencySeconds);
+	GetWorldTimerManager().SetTimer(SpawnTimerHandle, this, &ADeliveryGameMode::TickSpawnDelivery, SpawnTimerFrequency, false);
 }
 
 void ADeliveryGameMode::WarpPlayerToCircle(int32 CircleIndex) 
@@ -174,4 +218,9 @@ ADeliveryItem* ADeliveryGameMode::GetActiveDelivery() const
 int32 ADeliveryGameMode::GetScore() const
 {
     return Score;
+}
+
+bool ADeliveryGameMode::IsGameOver() const
+{
+    return GameOver;
 }
