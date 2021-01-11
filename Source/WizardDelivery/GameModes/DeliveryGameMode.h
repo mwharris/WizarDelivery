@@ -43,7 +43,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
 	void NotifyHUDInputProcessed(int32 CircleNum, int32 ComboIndex, bool Correct);
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
-	void NotifyHUDUpdateScore(int32 NewScore);
+	void NotifyHUDUpdateScore(int32 NewScore, int32 CircleNum);
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
 	void NotifyHUDGameOver(int32 FinalScore);
 

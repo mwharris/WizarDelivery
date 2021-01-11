@@ -1,6 +1,8 @@
 #include "TeleportCircle.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SpotLightComponent.h" 
+#include "Components/TextRenderComponent.h"
 #include "WizardDelivery/Actors/DeliveryItem.h"
 
 ATeleportCircle::ATeleportCircle()
@@ -18,11 +20,18 @@ ATeleportCircle::ATeleportCircle()
 
 	PlayerPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Player Point"));
 	PlayerPoint->SetupAttachment(RootComponent);
+
+	TextRenderer = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Circle Number Renderer"));
+	TextRenderer->SetupAttachment(RootComponent);
+
+	SpotLight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Spot Light"));
+	SpotLight->SetupAttachment(RootComponent);
 }
 
 void ATeleportCircle::BeginPlay()
 {
 	Super::BeginPlay();
+	TextRenderer->SetText(FText::AsNumber(CircleNum));
 }
 
 bool ATeleportCircle::IsEmpty() const
@@ -43,4 +52,9 @@ ADeliveryItem* ATeleportCircle::GetDelivery() const
 void ATeleportCircle::SetDelivery(ADeliveryItem* DeliveryItem) 
 {
 	CurrDelivery = DeliveryItem;
+}
+
+void ATeleportCircle::SetLightActive(bool IsActive) 
+{
+	SpotLight->SetVisibility(IsActive);
 }

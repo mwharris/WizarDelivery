@@ -7,6 +7,8 @@
 class ADeliveryItem;
 class UBoxComponent;
 class UStaticMeshComponent;
+class USpotLightComponent;
+class UTextRenderComponent;
 
 UCLASS()
 class WIZARDDELIVERY_API ATeleportCircle : public AActor
@@ -22,6 +24,10 @@ public:
 	USceneComponent* DeliveryPoint;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USceneComponent* PlayerPoint;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UTextRenderComponent* TextRenderer;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USpotLightComponent* SpotLight;
 
 	UFUNCTION(BlueprintCallable, Category="Delivery")
 	ADeliveryItem* GetDelivery() const;
@@ -30,6 +36,7 @@ public:
 	bool IsEmpty() const;
 	int32 GetCircleNum() const;
 	void SetDelivery(ADeliveryItem* DeliveryItem);
+	void SetLightActive(bool IsActive);
 
 protected:
 	virtual void BeginPlay() override;
