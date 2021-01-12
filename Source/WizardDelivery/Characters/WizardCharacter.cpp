@@ -44,5 +44,9 @@ void AWizardCharacter::WarpToCircle(int32 Index)
 
 void AWizardCharacter::PerformGesture(FString GestureName) 
 {
+	if (ChantSound != nullptr) 
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), ChantSound);
+	}
 	GameModeRef->ProcessGesture(GestureName);
 }

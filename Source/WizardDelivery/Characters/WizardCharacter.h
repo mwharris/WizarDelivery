@@ -25,4 +25,8 @@ protected:
 	void WarpToCircle(int32 Index);
 	void PerformGesture(FString GestureName);
 
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds", meta = (AllowPrivateAccess = "true"))
+	USoundBase* ChantSound;
+
 };
