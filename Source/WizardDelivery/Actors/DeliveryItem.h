@@ -41,6 +41,11 @@ private:
 	float ExpireTickFrequency = 0.5f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Expire Timer", meta=(AllowPrivateAccess="true"))
 	float CurrExpireTime = 0.f;
+	
+	UPROPERTY(EditAnywhere, Category="Effects")
+	UParticleSystem* ExplosionParticles;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* ExplodeSound;
 
 	int32 Score = 0;
 	TArray<FGestureStruct*> Combination;

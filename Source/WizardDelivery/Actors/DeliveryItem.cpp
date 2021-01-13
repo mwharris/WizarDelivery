@@ -77,12 +77,12 @@ void ADeliveryItem::ResolveDelivery(bool Success)
 {
 	if (Success) 
 	{
-		// TODO: Teleport it away
 		Destroy();
 	}
 	else
 	{
-		// TODO: Blow it up
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), ExplodeSound, GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionParticles, GetActorLocation());
 		Destroy();
 	}
 }
