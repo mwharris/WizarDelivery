@@ -17,11 +17,6 @@ void AWizardCharacter::BeginPlay()
 	}
 }
 
-void AWizardCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void AWizardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);

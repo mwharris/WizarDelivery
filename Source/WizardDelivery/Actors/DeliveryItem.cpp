@@ -8,7 +8,7 @@
 
 ADeliveryItem::ADeliveryItem()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
 	SetRootComponent(BoxCollider);
@@ -29,6 +29,21 @@ void ADeliveryItem::BeginPlay()
 	// Set up our expire timer
 	CurrExpireTime = MaxExpireTime;
 	GetWorldTimerManager().SetTimer(ExpireTimerHandle, this, &ADeliveryItem::ExpireTick, ExpireTickFrequency, true);
+}
+
+// TODO: Test moving this out of Tick!
+void ADeliveryItem::Tick(float DeltaTime) 
+{
+	Super::Tick(DeltaTime);
+	UE_LOG(LogTemp, Warning, TEXT("We ticking!"));
+	FVector NewLocation = GetActorLocation();
+	FRotator NewRotation = GetActorRotation();
+	float RunningTime = GetGameTimeSinceCreation();
+	float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
+	NewLocation.Z += DeltaHeight * 20.0f;       //Scale our height by a factor of 20
+	float DeltaRotation = DeltaTime * 20.0f;    //Rotate by 20 degrees per second
+	NewRotation.Yaw += DeltaRotation;
+	SetActorLocationAndRotation(NewLocation, NewRotation);
 }
 
 void ADeliveryItem::ExpireTick() 

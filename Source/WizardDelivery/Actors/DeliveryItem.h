@@ -25,6 +25,7 @@ public:
 	TArray<FString> GetCombinationUI() const;
 
 	ADeliveryItem();
+	virtual void Tick(float DeltaTime) override;
 	void CreateCombination(int32 MinGestureNum, int32 MaxGestureNum, UDataTable* GestureDataTable);
 	TArray<FGestureStruct*> GetCombination() const;
 	void ResolveDelivery(bool Success);
