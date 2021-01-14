@@ -8,7 +8,7 @@
 
 ADeliveryItem::ADeliveryItem()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
 	SetRootComponent(BoxCollider);
@@ -29,21 +29,8 @@ void ADeliveryItem::BeginPlay()
 	// Set up our expire timer
 	CurrExpireTime = MaxExpireTime;
 	GetWorldTimerManager().SetTimer(ExpireTimerHandle, this, &ADeliveryItem::ExpireTick, ExpireTickFrequency, true);
-}
-
-// TODO: Test moving this out of Tick!
-void ADeliveryItem::Tick(float DeltaTime) 
-{
-	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("We ticking!"));
-	FVector NewLocation = GetActorLocation();
-	FRotator NewRotation = GetActorRotation();
-	float RunningTime = GetGameTimeSinceCreation();
-	float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
-	NewLocation.Z += DeltaHeight * 20.0f;       //Scale our height by a factor of 20
-	float DeltaRotation = DeltaTime * 20.0f;    //Rotate by 20 degrees per second
-	NewRotation.Yaw += DeltaRotation;
-	SetActorLocationAndRotation(NewLocation, NewRotation);
+	// Set up our rotation/bob timer
+	GetWorldTimerManager().SetTimer(BobTimerHandle, this, &ADeliveryItem::BobTick, BobTickFrequency, true);
 }
 
 void ADeliveryItem::ExpireTick() 
@@ -65,6 +52,20 @@ void ADeliveryItem::ExpireTick()
 	{
 		Destroy();
 	}
+}
+
+void ADeliveryItem::BobTick() 
+{
+	UE_LOG(LogTemp, Warning, TEXT("ADeliveryItem::BobTick()..."));
+	float DeltaTime = BobTickFrequency;
+	FVector NewLocation = GetActorLocation();
+	FRotator NewRotation = GetActorRotation();
+	float RunningTime = GetGameTimeSinceCreation();
+	float DeltaHeight = (FMath::Sin(RunningTime + DeltaTime) - FMath::Sin(RunningTime));
+	NewLocation.Z += DeltaHeight * 20.0f;       //Scale our height by a factor of 20
+	float DeltaRotation = DeltaTime * 20.0f;    //Rotate by 20 degrees per second
+	NewRotation.Yaw += DeltaRotation;
+	SetActorLocationAndRotation(NewLocation, NewRotation);
 }
 
 void ADeliveryItem::CreateCombination(int32 MinGestureNum, int32 MaxGestureNum, UDataTable* GestureDataTable) 
@@ -117,7 +118,14 @@ TArray<FString> ADeliveryItem::GetCombinationUI() const
 	TArray<FString> ReturnArray;
 	for (FGestureStruct* Gesture : Combination) 
 	{
-		ReturnArray.Add(Gesture->UISymbol);
+		if (Gesture != nullptr) 
+		{
+			ReturnArray.Add(Gesture->UISymbol);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("ADeliveryItem::GetCombinationUI(): Gesture was a nullptr!"));
+		}
 	}
 	return ReturnArray;
 }

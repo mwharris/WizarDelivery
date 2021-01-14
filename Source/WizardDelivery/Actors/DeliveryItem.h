@@ -25,7 +25,6 @@ public:
 	TArray<FString> GetCombinationUI() const;
 
 	ADeliveryItem();
-	virtual void Tick(float DeltaTime) override;
 	void CreateCombination(int32 MinGestureNum, int32 MaxGestureNum, UDataTable* GestureDataTable);
 	TArray<FGestureStruct*> GetCombination() const;
 	void ResolveDelivery(bool Success);
@@ -42,6 +41,13 @@ private:
 	float ExpireTickFrequency = 0.5f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Expire Timer", meta=(AllowPrivateAccess="true"))
 	float CurrExpireTime = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Bob/Float Properties", meta=(AllowPrivateAccess="true"))
+	float BobTickFrequency = 0.25f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Bob/Float Properties", meta=(AllowPrivateAccess="true"))
+	float BobFloatSpeed = 20.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Bob/Float Properties", meta=(AllowPrivateAccess="true"))
+	float BobRotationSpeed = 20.f;
 	
 	UPROPERTY(EditAnywhere, Category="Effects")
 	UParticleSystem* ExplosionParticles;
@@ -51,8 +57,10 @@ private:
 	int32 Score = 0;
 	TArray<FGestureStruct*> Combination;
 	FTimerHandle ExpireTimerHandle;
+	FTimerHandle BobTimerHandle;
 	ADeliveryGameMode* GameModeRef;
 
 	void ExpireTick();
+	void BobTick();
 
 };
