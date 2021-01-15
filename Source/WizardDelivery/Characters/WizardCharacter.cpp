@@ -15,6 +15,7 @@ void AWizardCharacter::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Wizard: Could not find Game Mode!"));
 	}
+	Lives = 3;
 }
 
 void AWizardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -34,14 +35,27 @@ void AWizardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void AWizardCharacter::WarpToCircle(int32 Index) 
 {
+	if (GameModeRef->IsGameOver()) { return; }
 	GameModeRef->WarpPlayerToCircle(Index - 1);
 }
 
 void AWizardCharacter::PerformGesture(FString GestureName) 
 {
+	if (GameModeRef->IsGameOver()) { return; } 
 	if (ChantSound != nullptr) 
 	{
 		UGameplayStatics::PlaySound2D(GetWorld(), ChantSound);
 	}
 	GameModeRef->ProcessGesture(GestureName);
+}
+
+bool AWizardCharacter::HandleLoss()
+{
+	Lives--;
+	return Lives <= 0;	
+}
+
+int32 AWizardCharacter::GetLives() const
+{
+	return Lives;	
 }

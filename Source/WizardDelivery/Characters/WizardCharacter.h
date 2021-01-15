@@ -16,6 +16,8 @@ class WIZARDDELIVERY_API AWizardCharacter : public ACharacter
 public:
 	AWizardCharacter();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	int32 GetLives() const;
+	bool HandleLoss();
 
 protected:
 	ADeliveryGameMode* GameModeRef;
@@ -27,5 +29,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds", meta = (AllowPrivateAccess = "true"))
 	USoundBase* ChantSound;
+
+	int32 Lives = 3;
 
 };

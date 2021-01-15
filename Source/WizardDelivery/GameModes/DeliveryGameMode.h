@@ -43,7 +43,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
 	void NotifyHUDDeliveryCreated(int32 CircleNum);
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
-	void NotifyHUDInputProcessed(int32 CircleNum, int32 ComboIndex, bool Correct);
+	void NotifyHUDInputProcessed(int32 CircleNum, int32 ComboIndex, bool Correct, int32 RemainingLives);
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
 	void NotifyHUDUpdateScore(int32 NewScore, int32 CircleNum);
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
@@ -72,6 +72,7 @@ private:
 	float RampUpFrequencySeconds = 20.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	float MinSpawnTime = 0.5f;
+
 	int32 NumGestures = 0;
 	TArray<ATeleportCircle*> TeleportCircles; 
 	AWizardCharacter* PlayerRef;

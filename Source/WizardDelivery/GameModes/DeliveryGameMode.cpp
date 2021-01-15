@@ -137,35 +137,35 @@ void ADeliveryGameMode::ProcessGesture(FString GestureName)
     // Get the Gesture associated with the input (if one exists)
     static const FString ContextString(TEXT("GestureStruct"));
     FGestureStruct* InputGesture = GestureDataTable->FindRow<FGestureStruct>(FName(GestureName), ContextString, true);
-    if (InputGesture != nullptr) 
+    if (InputGesture == nullptr) 
+    { 
+        UE_LOG(LogTemp, Error, TEXT("GameMode::ProcessGesture(): Could not find gesture!"));
+        return;
+    } 
+    // Get the Gesture combination from the Delivery
+    TArray<FGestureStruct*> DeliveryCombination = ActiveDelivery->GetCombination();
+    FGestureStruct* CombinationGesture = DeliveryCombination[CombinationIndex];
+    // Verify that both are equal
+    if (CombinationGesture != nullptr && CombinationGesture->GestureId == InputGesture->GestureId) 
     {
-        // Get the Gesture combination from the Delivery
-        TArray<FGestureStruct*> DeliveryCombination = ActiveDelivery->GetCombination();
-        FGestureStruct* CombinationGesture = DeliveryCombination[CombinationIndex];
-        // Verify that both GestureIds are equal
-        if (CombinationGesture != nullptr && CombinationGesture->GestureId == InputGesture->GestureId) 
+        NotifyHUDInputProcessed(PlayerIndex + 1, CombinationIndex, true, PlayerRef->GetLives());
+        CombinationIndex++;
+        if (CombinationIndex == DeliveryCombination.Num()) 
         {
-            NotifyHUDInputProcessed(PlayerIndex + 1, CombinationIndex, true);
-            CombinationIndex++;
-            if (CombinationIndex == DeliveryCombination.Num()) 
-            {
-                ResolveDelivery(true, DeliveryCombination.Num());
-            }
+            ResolveDelivery(true, DeliveryCombination.Num());
         }
-        else 
-        {
-            NotifyHUDInputProcessed(PlayerIndex + 1, CombinationIndex, false);
-            ResolveDelivery(false, DeliveryCombination.Num());
-        }
-    }
+    }   
     else 
     {
-        UE_LOG(LogTemp, Error, TEXT("GameMode::ProcessGesture(): Could not find gesture!"));
-    }
+        PlayerRef->HandleLoss();
+        NotifyHUDInputProcessed(PlayerIndex + 1, CombinationIndex, false, PlayerRef->GetLives());
+        ResolveDelivery(false, DeliveryCombination.Num());
+    } 
 }
 
 void ADeliveryGameMode::ResolveDelivery(bool Success, int32 ComboLength, bool DelayDestroy) 
 {
+    // Clear the failed delivery 
     TeleportCircles[PlayerIndex]->SetDelivery(nullptr);
     if (!DelayDestroy)
     {
@@ -173,15 +173,16 @@ void ADeliveryGameMode::ResolveDelivery(bool Success, int32 ComboLength, bool De
     }
     ActiveDelivery = nullptr;
     CombinationIndex = 0;
+    // Handle loss depending on if the player is dead
     if (Success) 
     {
         Score += ComboLength;
         NotifyHUDUpdateScore(Score, TeleportCircles[PlayerIndex]->GetCircleNum());
     }
-    else 
+    else if (PlayerRef->GetLives() <= 0)
     {
         GameOver = true;
-	    NotifyHUDGameOver(Score);
+        NotifyHUDGameOver(Score); 
     }
 }
 
