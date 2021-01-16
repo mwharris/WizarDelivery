@@ -1,6 +1,5 @@
 #include "TeleportCircle.h"
 #include "Components/BoxComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Components/SpotLightComponent.h" 
 #include "Components/TextRenderComponent.h"
 #include "WizardDelivery/Actors/DeliveryItem.h"
@@ -11,9 +10,6 @@ ATeleportCircle::ATeleportCircle()
 
 	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collider"));
 	SetRootComponent(BoxCollider);
-
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh"));
-	StaticMesh->SetupAttachment(RootComponent);
 
 	DeliveryPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Delivery Point"));
 	DeliveryPoint->SetupAttachment(RootComponent);

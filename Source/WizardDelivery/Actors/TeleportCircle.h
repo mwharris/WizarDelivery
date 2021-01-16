@@ -6,7 +6,6 @@
 
 class ADeliveryItem;
 class UBoxComponent;
-class UStaticMeshComponent;
 class USpotLightComponent;
 class UTextRenderComponent;
 
@@ -19,8 +18,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UBoxComponent* BoxCollider;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UStaticMeshComponent* StaticMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USceneComponent* DeliveryPoint;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USceneComponent* PlayerPoint;
@@ -30,11 +27,12 @@ public:
 	USpotLightComponent* SpotLight;
 
 	UFUNCTION(BlueprintCallable, Category="Delivery")
+	int32 GetCircleNum() const;
+	UFUNCTION(BlueprintCallable, Category="Delivery")
 	ADeliveryItem* GetDelivery() const;
 
 	ATeleportCircle();
 	bool IsEmpty() const;
-	int32 GetCircleNum() const;
 	void SetDelivery(ADeliveryItem* DeliveryItem);
 	void SetLightActive(bool IsActive);
 
