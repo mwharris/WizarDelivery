@@ -56,7 +56,6 @@ void ADeliveryItem::ExpireTick()
 
 void ADeliveryItem::BobTick() 
 {
-	UE_LOG(LogTemp, Warning, TEXT("ADeliveryItem::BobTick()..."));
 	float DeltaTime = BobTickFrequency;
 	FVector NewLocation = GetActorLocation();
 	FRotator NewRotation = GetActorRotation();
@@ -96,6 +95,7 @@ void ADeliveryItem::ResolveDelivery(bool Success)
 		GetWorldTimerManager().ClearTimer(ExpireTimerHandle);
 		GetWorldTimerManager().ClearTimer(BobTimerHandle);
 		GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ADeliveryItem::KillSelf, 2.f, true);
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), TeleportSound, GetActorLocation());
 		SpawnTeleportEffect();
 	}
 	else

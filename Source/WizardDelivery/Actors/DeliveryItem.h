@@ -53,6 +53,8 @@ private:
 	float BobRotationSpeed = 20.f;
 	
 	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* TeleportSound;
+	UPROPERTY(EditAnywhere, Category="Effects")
 	UParticleSystem* ExplosionParticles;
 	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* ExplodeSound;
