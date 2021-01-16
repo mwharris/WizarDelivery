@@ -32,6 +32,9 @@ public:
 	float GetCurrExpireTime() const;
 
 protected:
+	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
+	void SpawnTeleportEffect();
+
 	virtual void BeginPlay() override;
 
 private:
@@ -58,9 +61,11 @@ private:
 	TArray<FGestureStruct*> Combination;
 	FTimerHandle ExpireTimerHandle;
 	FTimerHandle BobTimerHandle;
+	FTimerHandle DestroyTimerHandle;
 	ADeliveryGameMode* GameModeRef;
 
 	void ExpireTick();
 	void BobTick();
+	void KillSelf();
 
 };

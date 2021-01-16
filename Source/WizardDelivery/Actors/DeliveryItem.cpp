@@ -93,7 +93,10 @@ void ADeliveryItem::ResolveDelivery(bool Success)
 {
 	if (Success) 
 	{
-		Destroy();
+		GetWorldTimerManager().ClearTimer(ExpireTimerHandle);
+		GetWorldTimerManager().ClearTimer(BobTimerHandle);
+		GetWorldTimerManager().SetTimer(DestroyTimerHandle, this, &ADeliveryItem::KillSelf, 2.f, true);
+		SpawnTeleportEffect();
 	}
 	else
 	{
@@ -101,6 +104,12 @@ void ADeliveryItem::ResolveDelivery(bool Success)
 		UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionParticles, GetActorLocation());
 		Destroy();
 	}
+}
+
+void ADeliveryItem::KillSelf() 
+{
+	UE_LOG(LogTemp, Warning, TEXT("Killing Self!"));
+	Destroy();	
 }
 
 float ADeliveryItem::GetMaxExpireTime() const
