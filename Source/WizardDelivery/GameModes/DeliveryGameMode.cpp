@@ -93,6 +93,8 @@ void ADeliveryGameMode::TickSpawnDelivery()
         int32 RandIndex = EmptyCircles.Num() == 1 ? 0 : FMath::RandRange(0, EmptyCircles.Num() - 1);
         ATeleportCircle* TCircle = EmptyCircles[RandIndex];
         SpawnDeliveryAtCircle(TCircle);
+        // Play a sound
+        UGameplayStatics::SpawnSound2D(GetWorld(), SpawnSound);
         // Ramp up if our counter expired
         if (RampUpCounter <= 0) 
         {

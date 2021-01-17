@@ -43,6 +43,10 @@ void AWizardCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void AWizardCharacter::WarpToCircle(int32 Index) 
 {
 	if (GameModeRef->IsGameOver()) { return; }
+	if (MoveSound != nullptr) 
+	{
+		UGameplayStatics::PlaySound2D(GetWorld(), MoveSound);
+	}
 	GameModeRef->WarpPlayerToCircle(Index - 1);
 }
 

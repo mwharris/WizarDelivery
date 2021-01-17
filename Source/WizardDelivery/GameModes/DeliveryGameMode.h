@@ -72,6 +72,8 @@ private:
 	float RampUpFrequencySeconds = 20.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	float MinSpawnTime = 0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	USoundBase* SpawnSound;
 
 	int32 NumGestures = 0;
 	TArray<ATeleportCircle*> TeleportCircles; 
