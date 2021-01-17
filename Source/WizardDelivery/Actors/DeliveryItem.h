@@ -55,6 +55,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* TeleportSound;
 	UPROPERTY(EditAnywhere, Category="Effects")
+	UParticleSystem* SpawnParticles;
+	UPROPERTY(EditAnywhere, Category="Effects")
 	UParticleSystem* ExplosionParticles;
 	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* ExplodeSound;

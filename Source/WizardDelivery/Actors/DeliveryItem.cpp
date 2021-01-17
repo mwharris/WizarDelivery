@@ -32,7 +32,7 @@ void ADeliveryItem::BeginPlay()
 	// Set up our rotation/bob timer
 	GetWorldTimerManager().SetTimer(BobTimerHandle, this, &ADeliveryItem::BobTick, BobTickFrequency, true);
 	// Spawn a particle
-	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionParticles, GetActorLocation());
+	UGameplayStatics::SpawnEmitterAtLocation(this, SpawnParticles, GetActorLocation());
 }
 
 void ADeliveryItem::ExpireTick() 
@@ -126,15 +126,18 @@ float ADeliveryItem::GetCurrExpireTime() const
 TArray<FString> ADeliveryItem::GetCombinationUI() const
 {
 	TArray<FString> ReturnArray;
-	for (FGestureStruct* Gesture : Combination) 
+	if (Combination.Num() > 0) 
 	{
-		if (Gesture != nullptr) 
+		for (FGestureStruct* Gesture : Combination) 
 		{
-			ReturnArray.Add(Gesture->UISymbol);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("ADeliveryItem::GetCombinationUI(): Gesture was a nullptr!"));
+			if (Gesture != nullptr) 
+			{
+				ReturnArray.Add(Gesture->UISymbol);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("ADeliveryItem::GetCombinationUI(): Gesture was a nullptr!"));
+			}
 		}
 	}
 	return ReturnArray;
