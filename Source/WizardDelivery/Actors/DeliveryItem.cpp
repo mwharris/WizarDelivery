@@ -31,6 +31,8 @@ void ADeliveryItem::BeginPlay()
 	GetWorldTimerManager().SetTimer(ExpireTimerHandle, this, &ADeliveryItem::ExpireTick, ExpireTickFrequency, true);
 	// Set up our rotation/bob timer
 	GetWorldTimerManager().SetTimer(BobTimerHandle, this, &ADeliveryItem::BobTick, BobTickFrequency, true);
+	// Spawn a particle
+	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionParticles, GetActorLocation());
 }
 
 void ADeliveryItem::ExpireTick() 
