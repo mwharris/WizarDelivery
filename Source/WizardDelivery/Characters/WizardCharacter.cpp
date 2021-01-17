@@ -1,4 +1,6 @@
 #include "WizardCharacter.h"
+#include "Animation/AnimInstance.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "WizardDelivery/GameModes/DeliveryGameMode.h"
 
@@ -14,6 +16,11 @@ void AWizardCharacter::BeginPlay()
 	if (GameModeRef == nullptr) 
 	{
 		UE_LOG(LogTemp, Error, TEXT("Wizard: Could not find Game Mode!"));
+	}
+	SkeletalMesh = GetMesh();
+	if (SkeletalMesh == nullptr) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("Wizard: Could not find Skeletal Mesh!"));
 	}
 	Lives = 3;
 }
@@ -49,9 +56,19 @@ void AWizardCharacter::PerformGesture(FString GestureName)
 	GameModeRef->ProcessGesture(GestureName);
 }
 
+void AWizardCharacter::CastTeleport()
+{
+	if (SkeletalMesh == nullptr) { return; }
+	SkeletalMesh->GetAnimInstance()->Montage_Play(CastMontage);
+}
+
 bool AWizardCharacter::HandleLoss()
 {
 	Lives--;
+	if (SkeletalMesh != nullptr) 
+	{
+		SkeletalMesh->GetAnimInstance()->Montage_Play(HurtMontage);
+	}
 	return Lives <= 0;	
 }
 

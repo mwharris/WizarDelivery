@@ -152,6 +152,7 @@ void ADeliveryGameMode::ProcessGesture(FString GestureName)
         CombinationIndex++;
         if (CombinationIndex == DeliveryCombination.Num()) 
         {
+            PlayerRef->CastTeleport();
             ResolveDelivery(true, DeliveryCombination.Num());
         }
     }   

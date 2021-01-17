@@ -5,6 +5,7 @@
 #include "WizardCharacter.generated.h"
 
 class ADeliveryGameMode;
+class UAnimMontage;
 
 UCLASS()
 class WIZARDDELIVERY_API AWizardCharacter : public ACharacter
@@ -18,6 +19,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	int32 GetLives() const;
 	bool HandleLoss();
+	void CastTeleport();
 
 protected:
 	ADeliveryGameMode* GameModeRef;
@@ -27,9 +29,15 @@ protected:
 	void PerformGesture(FString GestureName);
 
 private:
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds", meta = (AllowPrivateAccess = "true"))
 	USoundBase* ChantSound;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* CastMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sounds", meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* HurtMontage;
 
+	USkeletalMeshComponent* SkeletalMesh;
 	int32 Lives = 3;
 
 };

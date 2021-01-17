@@ -108,7 +108,6 @@ void ADeliveryItem::ResolveDelivery(bool Success)
 
 void ADeliveryItem::KillSelf() 
 {
-	UE_LOG(LogTemp, Warning, TEXT("Killing Self!"));
 	Destroy();	
 }
 
