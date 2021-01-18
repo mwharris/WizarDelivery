@@ -50,6 +50,8 @@ protected:
 	void NotifyHUDGameOver(int32 FinalScore);
 	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
 	void NotifyHUDDeliveryTimer(int32 CircleNum, float Percent);
+	UFUNCTION(BlueprintImplementableEvent, meta=(AllowPrivateAccess = "true"))
+	void NotifyHUDLifeLost(int32 RemainingLives);
 
 	virtual void BeginPlay() override;
 
@@ -89,6 +91,6 @@ private:
 	void Init();
 	void SpawnDeliveryAtCircle(ATeleportCircle* TCircle);
 	void TickSpawnDelivery();
-	void ResolveDelivery(bool Success, int32 ComboLength, bool DelayDestroy = false);
+	void ResolveDelivery(int32 CircleIndex, bool Success, int32 ComboLength, bool DelayDestroy = false);
 
 };

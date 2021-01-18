@@ -52,7 +52,7 @@ void ADeliveryItem::ExpireTick()
 	// Kill ourselves if the GameMode says so
 	if (GameModeRef->DeliveryExpireTick(this)) 
 	{
-		Destroy();
+		ResolveDelivery(false);
 	}
 }
 

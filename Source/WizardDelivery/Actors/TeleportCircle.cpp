@@ -32,7 +32,7 @@ void ATeleportCircle::BeginPlay()
 
 bool ATeleportCircle::IsEmpty() const
 {
-	return GetDelivery() == nullptr;
+	return CurrDelivery == nullptr;
 }
 
 int32 ATeleportCircle::GetCircleNum() const

@@ -155,38 +155,15 @@ void ADeliveryGameMode::ProcessGesture(FString GestureName)
         if (CombinationIndex == DeliveryCombination.Num()) 
         {
             PlayerRef->CastTeleport();
-            ResolveDelivery(true, DeliveryCombination.Num());
+            ResolveDelivery(PlayerIndex, true, DeliveryCombination.Num());
         }
     }   
     else 
     {
         PlayerRef->HandleLoss();
         NotifyHUDInputProcessed(PlayerIndex + 1, CombinationIndex, false, PlayerRef->GetLives());
-        ResolveDelivery(false, DeliveryCombination.Num());
+        ResolveDelivery(PlayerIndex, false, DeliveryCombination.Num());
     } 
-}
-
-void ADeliveryGameMode::ResolveDelivery(bool Success, int32 ComboLength, bool DelayDestroy) 
-{
-    // Clear the failed delivery 
-    TeleportCircles[PlayerIndex]->SetDelivery(nullptr);
-    if (!DelayDestroy)
-    {
-        ActiveDelivery->ResolveDelivery(Success);
-    }
-    ActiveDelivery = nullptr;
-    CombinationIndex = 0;
-    // Handle loss depending on if the player is dead
-    if (Success) 
-    {
-        Score += ComboLength;
-        NotifyHUDUpdateScore(Score, TeleportCircles[PlayerIndex]->GetCircleNum());
-    }
-    else if (PlayerRef->GetLives() <= 0)
-    {
-        GameOver = true;
-        NotifyHUDGameOver(Score); 
-    }
 }
 
 bool ADeliveryGameMode::DeliveryExpireTick(ADeliveryItem* DeliveryItem) 
@@ -196,7 +173,7 @@ bool ADeliveryGameMode::DeliveryExpireTick(ADeliveryItem* DeliveryItem)
     int32 CircleNum = 0;
     for (ATeleportCircle* Circle : TeleportCircles) 
     {
-        if (Circle->GetDelivery() ==  DeliveryItem)
+        if (Circle->GetDelivery() == DeliveryItem)
         {
             CircleNum = Circle->GetCircleNum();
         }
@@ -207,10 +184,35 @@ bool ADeliveryGameMode::DeliveryExpireTick(ADeliveryItem* DeliveryItem)
     // Destroy the delivery and punish player if it expired
     if (DeliveryItem->GetCurrExpireTime() <= 0) 
     {
-        ResolveDelivery(false, DeliveryItem->GetCombination().Num(), true);
+        PlayerRef->HandleLoss();
+        NotifyHUDLifeLost(PlayerRef->GetLives());
+        ResolveDelivery(CircleNum - 1, false, DeliveryItem->GetCombination().Num(), true);
         return true;
     }
     return false;
+}
+
+void ADeliveryGameMode::ResolveDelivery(int32 CircleIndex, bool Success, int32 ComboLength, bool DelayDestroy) 
+{
+    // Clear the failed delivery 
+    TeleportCircles[CircleIndex]->SetDelivery(nullptr);
+    if (!DelayDestroy)
+    {
+        ActiveDelivery->ResolveDelivery(Success);
+    }
+    ActiveDelivery = nullptr;
+    CombinationIndex = 0;
+    // Handle loss depending on if the player is dead
+    if (Success) 
+    {
+        Score += ComboLength;
+        NotifyHUDUpdateScore(Score, TeleportCircles[CircleIndex]->GetCircleNum());
+    }
+    else if (PlayerRef->GetLives() <= 0)
+    {
+        GameOver = true;
+        NotifyHUDGameOver(Score); 
+    }
 }
 
 ADeliveryItem* ADeliveryGameMode::GetActiveDelivery() const
